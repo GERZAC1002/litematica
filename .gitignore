@@ -1,5 +1,5 @@
 .gradle
-.settings
+*.patch
 bin/
 build/
 eclipse/

@@ -325,7 +325,7 @@ public class ChunkRenderDispatcherLitematica
 
     private void uploadVertexBuffer(BufferBuilder buffer, VertexBuffer vertexBuffer)
     {
-        vertexBuffer.submitUpload(buffer);
+        vertexBuffer.upload(buffer.end());
     }
 
     public void clearChunkUpdates()

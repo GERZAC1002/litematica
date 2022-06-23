@@ -1,20 +1,21 @@
 package fi.dy.masa.litematica.render.schematic;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.config.Hotkeys;
+import fi.dy.masa.litematica.data.DataManager;
+import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
+import fi.dy.masa.litematica.world.ChunkSchematic;
+import fi.dy.masa.litematica.world.WorldSchematic;
+import fi.dy.masa.malilib.util.LayerRange;
+import fi.dy.masa.malilib.util.SubChunkPos;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.GlUniform;
 import net.minecraft.client.gl.VertexBuffer;
+import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.BufferRenderer;
@@ -41,14 +42,16 @@ import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.BlockRenderView;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.config.Hotkeys;
-import fi.dy.masa.litematica.data.DataManager;
-import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo.OverlayRenderType;
-import fi.dy.masa.litematica.world.ChunkSchematic;
-import fi.dy.masa.litematica.world.WorldSchematic;
-import fi.dy.masa.malilib.util.LayerRange;
-import fi.dy.masa.malilib.util.SubChunkPos;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class WorldRendererSchematic
 {
@@ -186,7 +189,9 @@ public class WorldRendererSchematic
             }
 
             this.displayListEntitiesDirty = true;
-            this.renderDistanceChunks = this.mc.options.viewDistance;
+            this.renderDistanceChunks = Optional.ofNullable(this.mc.options.getViewDistance())
+                    .map(SimpleOption::getValue)
+                    .orElse(0);
 
             if (this.chunkRendererDispatcher != null)
             {
@@ -223,7 +228,7 @@ public class WorldRendererSchematic
     {
         this.world.getProfiler().push("setup_terrain");
 
-        if (this.chunkRendererDispatcher == null || this.mc.options.viewDistance != this.renderDistanceChunks)
+        if (this.chunkRendererDispatcher == null || this.mc.options.getViewDistance().getValue() != this.renderDistanceChunks)
         {
             this.loadRenderers();
         }
@@ -277,7 +282,9 @@ public class WorldRendererSchematic
         BlockPos viewPos = new BlockPos(cameraX, cameraY + (double) entity.getStandingEyeHeight(), cameraZ);
         final int centerChunkX = (viewPos.getX() >> 4);
         final int centerChunkZ = (viewPos.getZ() >> 4);
-        final int renderDistance = this.mc.options.viewDistance;
+        final int renderDistance = Optional.ofNullable(this.mc.options.getViewDistance())
+                .map(SimpleOption::getValue)
+                .orElse(0);
         SubChunkPos viewSubChunk = new SubChunkPos(centerChunkX, viewPos.getY() >> 4, centerChunkZ);
         BlockPos viewPosSubChunk = new BlockPos(viewSubChunk.getX() << 4, viewSubChunk.getY() << 4, viewSubChunk.getZ() << 4);
 
@@ -500,7 +507,7 @@ public class WorldRendererSchematic
                 }
 
                 buffer.bind();
-                buffer.drawVertices();
+                buffer.drawElements();
                 startedDrawing = true;
 
                 ++count;
@@ -521,11 +528,10 @@ public class WorldRendererSchematic
 
         if (startedDrawing)
         {
-            renderLayer.getVertexFormat().endDrawing();
+            renderLayer.endDrawing();
         }
 
         VertexBuffer.unbind();
-        VertexBuffer.unbindVertexArray();
         renderLayer.endDrawing();
 
         this.world.getProfiler().pop();
@@ -602,7 +608,7 @@ public class WorldRendererSchematic
 
                     matrixStack.push();
                     matrixStack.translate(chunkOrigin.getX() - x, chunkOrigin.getY() - y, chunkOrigin.getZ() - z);
-                    buffer.setShader(matrixStack.peek().getPositionMatrix(), projMatrix, shader);
+                    buffer.draw(matrixStack.peek().getPositionMatrix(), projMatrix, shader);
                     matrixStack.pop();
                 }
             }
@@ -641,9 +647,9 @@ public class WorldRendererSchematic
         }
     }
 
-    public boolean renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
+    public void renderFluid(BlockRenderView world, FluidState state, BlockPos pos, BufferBuilder bufferBuilderIn)
     {
-        return this.blockRenderManager.renderFluid(pos, world, bufferBuilderIn, state.getBlockState(), state);
+        this.blockRenderManager.renderFluid(pos, world, bufferBuilderIn, state.getBlockState(), state);
     }
 
     public BakedModel getModelForState(BlockState state)

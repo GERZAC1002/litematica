@@ -1,32 +1,5 @@
 package fi.dy.masa.litematica.schematic;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.annotation.Nullable;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.StructureBlockMode;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.structure.Structure;
-import net.minecraft.structure.StructurePlacementData;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
 import fi.dy.masa.litematica.Litematica;
 import fi.dy.masa.litematica.schematic.LitematicaSchematic.EntityInfo;
 import fi.dy.masa.litematica.schematic.container.LitematicaBlockStateContainer;
@@ -39,6 +12,34 @@ import fi.dy.masa.malilib.gui.Message.MessageType;
 import fi.dy.masa.malilib.util.Constants;
 import fi.dy.masa.malilib.util.InfoUtils;
 import fi.dy.masa.malilib.util.NBTUtils;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.enums.StructureBlockMode;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.structure.StructurePlacementData;
+import net.minecraft.structure.StructureTemplate;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.WorldChunk;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SchematicaSchematic
 {
@@ -111,7 +112,7 @@ public class SchematicaSchematic
                         BlockPos pos = new BlockPos(x, y, z);
                         NbtCompound teNBT = this.tiles.get(pos);
 
-                        pos = Structure.transform(placement, pos).add(posStart);
+                        pos = StructureTemplate.transform(placement, pos).add(posStart);
 
                         state = state.mirror(mirror);
                         state = state.rotate(rotation);
@@ -167,7 +168,7 @@ public class SchematicaSchematic
                             BlockPos pos = new BlockPos(x, y, z);
                             NbtCompound teNBT = this.tiles.get(pos);
 
-                            pos = Structure.transform(placement, pos).add(posStart);
+                            pos = StructureTemplate.transform(placement, pos).add(posStart);
                             world.updateNeighbors(pos, world.getBlockState(pos).getBlock());
 
                             if (teNBT != null)
@@ -331,7 +332,7 @@ public class SchematicaSchematic
                 StructureBlockMode.valueOf(tag.getString("mode")) == StructureBlockMode.DATA)
             {
                 BlockPos pos = entry.getKey();
-                pos = Structure.transform(placement, pos).add(posStart);
+                pos = StructureTemplate.transform(placement, pos).add(posStart);
                 map.put(pos, tag.getString("metadata"));
             }
         }

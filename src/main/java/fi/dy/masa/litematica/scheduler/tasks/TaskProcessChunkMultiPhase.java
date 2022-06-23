@@ -1,20 +1,22 @@
 package fi.dy.masa.litematica.scheduler.tasks;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import javax.annotation.Nullable;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.util.ToBooleanFunction;
 import fi.dy.masa.malilib.util.IntBoundingBox;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+
+import javax.annotation.Nullable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
 {
@@ -148,11 +150,14 @@ public abstract class TaskProcessChunkMultiPhase extends TaskProcessChunkBase
 
     protected boolean checkCommandFeedbackGameRuleState(Text message)
     {
-        if (message instanceof TranslatableText translatableText)
+        if (message != null && message.getContent() instanceof TranslatableTextContent translatableText)
         {
             if ("commands.gamerule.query".equals(translatableText.getKey()))
             {
-                this.shouldEnableFeedback = translatableText.getString().contains("true");
+                this.shouldEnableFeedback = translatableText.visit(Optional::ofNullable)
+                        .filter(str -> str.contains("true"))
+                        .isPresent();
+
                 this.phase = TaskPhase.WAIT_FOR_CHUNKS;
 
                 if (this.shouldEnableFeedback)

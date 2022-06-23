@@ -611,22 +611,24 @@ public class OverlayRenderer
         BlockState stateClient = mc.world.getBlockState(pos);
 
         World worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        BlockState stateSchematic = worldSchematic.getBlockState(pos);
+        BlockState stateSchematic = null;
+        if (worldSchematic != null) {
+            stateSchematic = worldSchematic.getBlockState(pos);
+        }
         String ul = GuiBase.TXT_UNDERLINE;
 
-        if (stateSchematic != stateClient && stateClient.isAir() == false && stateSchematic.isAir() == false)
-        {
-            this.blockInfoLines.add(ul + "Schematic:");
-            this.addBlockInfoLines(stateSchematic);
+        if (stateSchematic != null) {
+            if (stateSchematic != stateClient && stateClient.isAir() == false && stateSchematic.isAir() == false) {
+                this.blockInfoLines.add(ul + "Schematic:");
+                this.addBlockInfoLines(stateSchematic);
 
-            this.blockInfoLines.add("");
-            this.blockInfoLines.add(ul + "Client:");
-            this.addBlockInfoLines(stateClient);
-        }
-        else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK)
-        {
-            this.blockInfoLines.add(ul + "Schematic:");
-            this.addBlockInfoLines(stateSchematic);
+                this.blockInfoLines.add("");
+                this.blockInfoLines.add(ul + "Client:");
+                this.addBlockInfoLines(stateClient);
+            } else if (traceWrapper.getHitType() == RayTraceWrapper.HitType.SCHEMATIC_BLOCK) {
+                this.blockInfoLines.add(ul + "Schematic:");
+                this.addBlockInfoLines(stateSchematic);
+            }
         }
     }
 

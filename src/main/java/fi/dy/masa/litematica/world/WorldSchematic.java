@@ -1,12 +1,9 @@
 package fi.dy.masa.litematica.world;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.render.LitematicaRenderer;
+import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -25,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.DynamicRegistryManager;
@@ -44,9 +42,13 @@ import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.tick.EmptyTickSchedulers;
 import net.minecraft.world.tick.QueryableTickScheduler;
-import fi.dy.masa.litematica.Reference;
-import fi.dy.masa.litematica.render.LitematicaRenderer;
-import fi.dy.masa.litematica.render.schematic.WorldRendererSchematic;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class WorldSchematic extends World
 {
@@ -63,7 +65,7 @@ public class WorldSchematic extends World
                              RegistryEntry<DimensionType> dimensionType,
                              Supplier<Profiler> supplier)
     {
-        super(mutableWorldProperties, REGISTRY_KEY, dimensionType, supplier, true, true, 0L);
+        super(mutableWorldProperties, REGISTRY_KEY, dimensionType, supplier, true, true, 0L, 0);
 
         this.mc = MinecraftClient.getInstance();
         this.worldRenderer = LitematicaRenderer.getInstance().getWorldRenderer();
@@ -430,7 +432,7 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void emitGameEvent(@org.jetbrains.annotations.Nullable Entity entity, GameEvent event, BlockPos pos)
+    public void emitGameEvent(GameEvent event, Vec3d emitterPos, GameEvent.Emitter emitter)
     {
         // NO-OP
     }
@@ -472,13 +474,13 @@ public class WorldSchematic extends World
     }
 
     @Override
-    public void playSound(PlayerEntity player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch)
+    public void playSound(PlayerEntity player, double x, double y, double z, SoundEvent soundIn, SoundCategory category, float volume, float pitch, long seed)
     {
         // NO-OP
     }
 
     @Override
-    public void playSoundFromEntity(@Nullable PlayerEntity player, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch)
+    public void playSoundFromEntity(@Nullable PlayerEntity player, Entity entity, SoundEvent sound, SoundCategory category, float volume, float pitch, long seed)
     {
         // NO-OP
     }

@@ -1,10 +1,8 @@
 package fi.dy.masa.litematica.mixin;
 
-import java.util.function.Supplier;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
+import fi.dy.masa.litematica.util.SchematicWorldRefresher;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
@@ -14,9 +12,13 @@ import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.schematic.verifier.SchematicVerifier;
-import fi.dy.masa.litematica.util.SchematicWorldRefresher;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.function.Supplier;
 
 @Mixin(ClientWorld.class)
 public abstract class MixinClientWorld extends World
@@ -27,13 +29,14 @@ public abstract class MixinClientWorld extends World
                              Supplier<Profiler> profiler,
                              boolean isClient,
                              boolean debugWorld,
-                             long seed)
+                             long seed,
+                             int maxChainedNeighborUpdates)
     {
-        super(properties, registryRef, registryEntry, profiler, isClient, debugWorld, seed);
+        super(properties, registryRef, registryEntry, profiler, isClient, debugWorld, seed, maxChainedNeighborUpdates);
     }
 
-    @Inject(method = "setBlockStateWithoutNeighborUpdates", at = @At("HEAD"))
-    private void onSetBlockStateWithoutNeighborUpdates(BlockPos pos, BlockState state, CallbackInfo ci)
+    @Inject(method = "setBlockState", at = @At("HEAD"))
+    private void onSetBlockState(BlockPos pos, BlockState state, int flags, int maxUpdateDepth, CallbackInfoReturnable<Boolean> ci)
     {
         SchematicVerifier.markVerifierBlockChanges(pos);
 
