@@ -1,18 +1,23 @@
 package fi.dy.masa.litematica.world;
 
-import java.util.OptionalLong;
-import javax.annotation.Nullable;
+import fi.dy.masa.litematica.Litematica;
+import fi.dy.masa.litematica.Reference;
+import fi.dy.masa.litematica.config.Configs;
+import fi.dy.masa.litematica.render.LitematicaRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
+import net.minecraft.util.registry.BuiltinRegistries;
 import net.minecraft.util.registry.RegistryEntry;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.dimension.DimensionType;
-import fi.dy.masa.litematica.Litematica;
-import fi.dy.masa.litematica.config.Configs;
-import fi.dy.masa.litematica.render.LitematicaRenderer;
 import net.minecraft.world.dimension.DimensionTypes;
+
+import javax.annotation.Nullable;
+import java.util.OptionalLong;
 
 public class SchematicWorldHandler
 {
@@ -20,7 +25,7 @@ public class SchematicWorldHandler
     public static final DimensionType DIMENSIONTYPE = new DimensionType(OptionalLong.of(6000L), false, false, false, false, 1.0,
                                                                            false, false, -64, 384, 384,
                                                                             BlockTags.INFINIBURN_END, DimensionTypes.OVERWORLD_ID, 0.0F,
-            new DimensionType.MonsterSettings(true, false, UniformIntProvider.create(0,15), 15));
+            new DimensionType.MonsterSettings(false, false, UniformIntProvider.create(0, 15), 1));
 
     @Nullable
     public static WorldSchematic getSchematicWorld()
@@ -31,7 +36,12 @@ public class SchematicWorldHandler
     public static WorldSchematic createSchematicWorld()
     {
         ClientWorld.Properties levelInfo = new ClientWorld.Properties(Difficulty.PEACEFUL, false, true);
-        return new WorldSchematic(levelInfo, RegistryEntry.of(DIMENSIONTYPE), MinecraftClient.getInstance()::getProfiler);
+
+        RegistryEntry<DimensionType> entry = BuiltinRegistries.DIMENSION_TYPE.getEntry(RegistryKey.of(BuiltinRegistries.DIMENSION_TYPE.getKey(), new Identifier(Reference.MOD_ID)))
+                .orElseThrow();
+
+        //RegistryEntry<DimensionType> entry = RegistryEntry.of(BuiltinRegistries.DIMENSION_TYPE.get(new Identifier(Reference.MOD_ID)));
+        return new WorldSchematic(levelInfo, entry, MinecraftClient.getInstance()::getProfiler);
     }
 
     public static void recreateSchematicWorld(boolean remove)

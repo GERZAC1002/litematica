@@ -1,6 +1,5 @@
 package fi.dy.masa.litematica;
 
-import net.minecraft.client.MinecraftClient;
 import fi.dy.masa.litematica.config.Configs;
 import fi.dy.masa.litematica.data.DataManager;
 import fi.dy.masa.litematica.event.InputHandler;
@@ -18,6 +17,11 @@ import fi.dy.masa.malilib.event.WorldLoadHandler;
 import fi.dy.masa.malilib.interfaces.IInitializationHandler;
 import fi.dy.masa.malilib.interfaces.IRenderer;
 import fi.dy.masa.malilib.network.ClientPacketChannelHandler;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.registry.BuiltinRegistries;
+import net.minecraft.util.registry.Registry;
+
+import static fi.dy.masa.litematica.world.SchematicWorldHandler.DIMENSIONTYPE;
 
 public class InitHandler implements IInitializationHandler
 {
@@ -47,5 +51,7 @@ public class InitHandler implements IInitializationHandler
 
         DataManager.getAreaSelectionsBaseDirectory();
         DataManager.getSchematicsBaseDirectory();
+
+        Registry.register(BuiltinRegistries.DIMENSION_TYPE, Reference.MOD_ID, DIMENSIONTYPE);
     }
 }

@@ -911,19 +911,25 @@ public class ChunkRendererSchematicVbo
 
     public enum OverlayRenderType
     {
-        OUTLINE     (VertexFormat.DrawMode.DEBUG_LINES),
-        QUAD        (VertexFormat.DrawMode.QUADS);
+        OUTLINE     (VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.LINES),
+        QUAD        (VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
 
         private final VertexFormat.DrawMode drawMode;
+        private final VertexFormat vertexFormat;
 
-        OverlayRenderType(VertexFormat.DrawMode drawMode)
+        OverlayRenderType(VertexFormat.DrawMode drawMode, VertexFormat vertexFormat)
         {
             this.drawMode = drawMode;
+            this.vertexFormat = vertexFormat;
         }
 
         public VertexFormat.DrawMode getDrawMode()
         {
             return this.drawMode;
+        }
+
+        public VertexFormat getVertexFormat() {
+            return vertexFormat;
         }
     }
 }
