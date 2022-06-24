@@ -9,5 +9,6 @@ Compiling
 =========
 * Clone the repository
 * Open a command prompt/terminal to the repository directory
-* run 'gradlew build'
+* run './gradlew genSources'
+* run './gradlew build'
 * The built jar file will be in build/libs/
